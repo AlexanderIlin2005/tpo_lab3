@@ -6,7 +6,11 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import ru.sashil.subscribe.pages.LoginPage;
+
+import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,6 +19,7 @@ public class LogoutTest {
 
     private WebDriver driver;
     private LoginPage loginPage;
+    private WebDriverWait wait;
 
     private final String BASE_URL = "https://subscribe.ru/";
     private final String EMAIL = "hacks.scraper_1r@icloud.com";
@@ -27,6 +32,7 @@ public class LogoutTest {
         options.addArguments("--start-maximized");
         driver = new ChromeDriver(options);
         loginPage = new LoginPage(driver);
+        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
 
     @BeforeEach
@@ -38,35 +44,25 @@ public class LogoutTest {
     @Test
     @DisplayName("UC-10: Выход из аккаунта")
     void testLogout() {
-        // Ищем меню пользователя
-        By userMenu = By.xpath("//a[contains(@href, '/member/')] | //*[@id='all']/header/ul/li[1]/a");
-        if (driver.findElements(userMenu).size() > 0) {
-            driver.findElement(userMenu).click();
-        }
+        // Кликаем по иконке человечка, чтобы открыть меню
+        By userIcon = By.xpath("//*[@id='all']/header/ul/li[1]/a");
+        wait.until(ExpectedConditions.elementToBeClickable(userIcon)).click();
 
+        // Ждём появления меню и кликаем по пункту "Выход"
+        By logoutBtn = By.xpath("//*[@id='logged_list']/li[9]/a");
+        wait.until(ExpectedConditions.elementToBeClickable(logoutBtn)).click();
+
+        // Ждём, пока произойдёт выход
         try {
-            Thread.sleep(500);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
 
-        // Кнопка выхода
-        By logoutBtn = By.xpath("//a[contains(text(), 'Выйти')] | //a[contains(@href, 'logout')]");
-        if (driver.findElements(logoutBtn).size() > 0) {
-            driver.findElement(logoutBtn).click();
-
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-
-            // Проверяем, что иконка входа снова видна
-            By loginIcon = By.xpath("//*[@id='all']/header/ul/li[1]/a");
-            assertTrue(driver.findElements(loginIcon).size() > 0, "Не удалось выйти из аккаунта");
-        } else {
-            assertTrue(true);
-        }
+        // Проверяем, что иконка человечка снова доступна для входа
+        By userIconAfterLogout = By.xpath("//*[@id='all']/header/ul/li[1]/a");
+        assertTrue(driver.findElements(userIconAfterLogout).size() > 0,
+                   "После выхода иконка человечка должна быть видна");
     }
 
     @AfterAll

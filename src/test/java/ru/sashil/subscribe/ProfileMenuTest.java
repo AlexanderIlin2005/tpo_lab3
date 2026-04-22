@@ -15,7 +15,7 @@ import java.time.Duration;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ProfileTest {
+public class ProfileMenuTest {
 
     private WebDriver driver;
     private LoginPage loginPage;
@@ -42,46 +42,51 @@ public class ProfileTest {
     }
 
     @Test
-    @DisplayName("UC-02: Заполнение анкеты подписчика")
-    void testFillQuestionnaire() {
-        // Открываем меню и переходим в профиль
+    @DisplayName("Переход в Мой профиль через меню")
+    void testGoToProfile() {
+        // Кликаем по иконке человечка
         By userIcon = By.xpath("//*[@id='all']/header/ul/li[1]/a");
         wait.until(ExpectedConditions.elementToBeClickable(userIcon)).click();
 
+        // Кликаем по пункту "Мой профиль"
         By profileBtn = By.xpath("//*[@id='logged_list']/li[1]/a/span[2]");
         wait.until(ExpectedConditions.elementToBeClickable(profileBtn)).click();
 
+        // Ждём загрузки страницы профиля
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
 
-        // Ищем ссылку на анкету
-        By anketaLink = By.xpath("//a[contains(@href, 'anketa') or contains(text(), 'Анкета')]");
-        if (driver.findElements(anketaLink).size() > 0) {
-            driver.findElement(anketaLink).click();
+        // Проверяем, что открылась страница профиля
+        String currentUrl = driver.getCurrentUrl();
+        assertTrue(currentUrl.contains("/member/") || currentUrl.contains("/profile"),
+                   "Должна открыться страница профиля: " + currentUrl);
+    }
 
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+    @Test
+    @DisplayName("Переход в Мои подписки через меню")
+    void testGoToSubscriptions() {
+        // Кликаем по иконке человечка
+        By userIcon = By.xpath("//*[@id='all']/header/ul/li[1]/a");
+        wait.until(ExpectedConditions.elementToBeClickable(userIcon)).click();
 
-            // Заполняем поля (если они есть)
-            By firstNameField = By.xpath("//input[@name='first_name' or contains(@id, 'first_name')]");
-            if (driver.findElements(firstNameField).size() > 0) {
-                driver.findElement(firstNameField).clear();
-                driver.findElement(firstNameField).sendKeys("Тест");
-            }
+        // Кликаем по пункту "Мои подписки"
+        By subscriptionsBtn = By.xpath("//*[@id='logged_list']/li[2]/a/span[2]");
+        wait.until(ExpectedConditions.elementToBeClickable(subscriptionsBtn)).click();
 
-            By saveButton = By.xpath("//button[contains(text(), 'Сохранить')] | //input[@value='Сохранить']");
-            if (driver.findElements(saveButton).size() > 0) {
-                driver.findElement(saveButton).click();
-            }
+        // Ждём загрузки
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
 
-        assertTrue(true, "Тест анкеты выполнен");
+        // Проверяем, что открылась страница с подписками
+        String currentUrl = driver.getCurrentUrl();
+        assertTrue(currentUrl.contains("/member/") || currentUrl.contains("/manage"),
+                   "Должна открыться страница управления подписками: " + currentUrl);
     }
 
     @AfterAll
