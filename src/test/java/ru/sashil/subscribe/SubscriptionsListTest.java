@@ -15,7 +15,7 @@ import java.time.Duration;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ProfileTest {
+public class SubscriptionsListTest {
 
     private WebDriver driver;
     private LoginPage loginPage;
@@ -43,25 +43,20 @@ public class ProfileTest {
     }
 
     @Test
-    @DisplayName("UC-02: Заполнение анкеты подписчика")
-    void testFillQuestionnaire() throws InterruptedException {
+    @DisplayName("UC-06: Просмотр списка активных подписок")
+    void testViewSubscriptions() {
         By userIcon = By.xpath("//*[@id='all']/header/ul/li[1]/a");
         wait.until(ExpectedConditions.elementToBeClickable(userIcon)).click();
 
-        By profileBtn = By.xpath("//*[@id='logged_list']/li[1]/a");
-        wait.until(ExpectedConditions.elementToBeClickable(profileBtn)).click();
+        By subscriptionsBtn = By.xpath("//*[@id='logged_list']/li[2]/a");
+        wait.until(ExpectedConditions.elementToBeClickable(subscriptionsBtn)).click();
 
         wait.until(ExpectedConditions.urlContains("/member/"));
 
-        By anketaLink = By.xpath("//a[contains(@href, 'anketa') or contains(text(), 'Анкета') or contains(text(), 'анкета')]");
-        if (driver.findElements(anketaLink).size() > 0) {
-            driver.findElement(anketaLink).click();
-            Thread.sleep(1000);
-        }
+        By subscriptionsList = By.xpath("//table | //div[contains(text(), 'подписано')] | //*[contains(@class, 'subscription')]");
+        boolean hasList = driver.findElements(subscriptionsList).size() > 0;
 
-        String currentUrl = driver.getCurrentUrl();
-        assertTrue(currentUrl.contains("anketa") || currentUrl.contains("profile"),
-                   "Должна быть страница анкеты: " + currentUrl);
+        assertTrue(hasList, "Список подписок должен отображаться");
     }
 
     @AfterAll

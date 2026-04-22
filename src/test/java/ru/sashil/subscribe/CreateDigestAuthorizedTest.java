@@ -15,7 +15,7 @@ import java.time.Duration;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ProfileTest {
+public class CreateDigestAuthorizedTest {
 
     private WebDriver driver;
     private LoginPage loginPage;
@@ -35,33 +35,26 @@ public class ProfileTest {
         wait = new WebDriverWait(driver, Duration.ofSeconds(15));
     }
 
-    @BeforeEach
-    void login() {
+    @Test
+    @DisplayName("UC-09: Создание рассылки (авторизованный пользователь)")
+    void testCreateDigestAuthorized() throws InterruptedException {
         driver.get(BASE_URL);
         loginPage.login(EMAIL, PASSWORD);
-        wait.until(ExpectedConditions.urlContains("/member/"));
-    }
+        Thread.sleep(2000);
 
-    @Test
-    @DisplayName("UC-02: Заполнение анкеты подписчика")
-    void testFillQuestionnaire() throws InterruptedException {
-        By userIcon = By.xpath("//*[@id='all']/header/ul/li[1]/a");
-        wait.until(ExpectedConditions.elementToBeClickable(userIcon)).click();
+        By createDigestBtn = By.xpath("//*[@id='all']/section/div[1]/div/div/a[1]");
+        wait.until(ExpectedConditions.elementToBeClickable(createDigestBtn)).click();
 
-        By profileBtn = By.xpath("//*[@id='logged_list']/li[1]/a");
-        wait.until(ExpectedConditions.elementToBeClickable(profileBtn)).click();
-
-        wait.until(ExpectedConditions.urlContains("/member/"));
-
-        By anketaLink = By.xpath("//a[contains(@href, 'anketa') or contains(text(), 'Анкета') or contains(text(), 'анкета')]");
-        if (driver.findElements(anketaLink).size() > 0) {
-            driver.findElement(anketaLink).click();
-            Thread.sleep(1000);
-        }
+        wait.until(ExpectedConditions.urlContains("/member/list/new"));
 
         String currentUrl = driver.getCurrentUrl();
-        assertTrue(currentUrl.contains("anketa") || currentUrl.contains("profile"),
-                   "Должна быть страница анкеты: " + currentUrl);
+        assertTrue(currentUrl.contains("/member/list/new"),
+                   "Должна открыться страница создания рассылки: " + currentUrl);
+
+        // Проверяем, что форма логина НЕ отображается (мы уже авторизованы)
+        By emailField = By.xpath("//*[@id=\"credential_0\"]");
+        boolean hasLoginForm = driver.findElements(emailField).size() > 0;
+        assertFalse(hasLoginForm, "Авторизованный пользователь не должен видеть форму логина");
     }
 
     @AfterAll
