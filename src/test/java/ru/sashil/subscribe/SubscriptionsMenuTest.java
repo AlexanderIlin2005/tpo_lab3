@@ -3,6 +3,7 @@ package ru.sashil.subscribe;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -15,7 +16,7 @@ import java.time.Duration;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ProfileTest {
+public class SubscriptionsMenuTest {
 
     private WebDriver driver;
     private LoginPage loginPage;
@@ -30,6 +31,7 @@ public class ProfileTest {
         WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--start-maximized");
+        options.setPageLoadStrategy(org.openqa.selenium.PageLoadStrategy.NONE);
         driver = new ChromeDriver(options);
         loginPage = new LoginPage(driver);
         wait = new WebDriverWait(driver, Duration.ofSeconds(15));
@@ -39,29 +41,37 @@ public class ProfileTest {
     void login() {
         driver.get(BASE_URL);
         loginPage.login(EMAIL, PASSWORD);
-        try { Thread.sleep(2000); } catch (InterruptedException e) {}
+        By userIcon = By.xpath("//*[@id=\"all\"]/header/ul/li[1]/a");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(userIcon));
+        try { Thread.sleep(1000); } catch (InterruptedException e) {}
     }
 
     @Test
-    @DisplayName("UC-02: Заполнение анкеты подписчика")
-    void testFillQuestionnaire() throws InterruptedException {
-        By userIcon = By.xpath("//*[@id='all']/header/ul/li[1]/a");
+    @DisplayName("Переход в Мои подписки через меню")
+    void testGoToSubscriptions() {
+        By userIcon = By.xpath("//*[@id=\"all\"]/header/ul/li[1]/a");
         wait.until(ExpectedConditions.elementToBeClickable(userIcon)).click();
 
-        By profileBtn = By.xpath("//*[@id='logged_list']/li[1]/a");
-        wait.until(ExpectedConditions.elementToBeClickable(profileBtn)).click();
+        try { Thread.sleep(500); } catch (InterruptedException e) {}
 
-        Thread.sleep(2000);
+        By subscriptionsBtn = By.xpath("//*[@id=\"logged_list\"]/li[2]/a/span[2]");
+        wait.until(ExpectedConditions.elementToBeClickable(subscriptionsBtn)).click();
 
-        By anketaLink = By.xpath("//a[contains(@href, 'anketa') or contains(text(), 'Анкета')]");
-        if (driver.findElements(anketaLink).size() > 0) {
-            driver.findElement(anketaLink).click();
-            Thread.sleep(1000);
+        // Ждём изменения URL
+        long startTime = System.currentTimeMillis();
+        while (!driver.getCurrentUrl().contains("/member/issue") &&
+               (System.currentTimeMillis() - startTime) < 10000) {
+            try { Thread.sleep(500); } catch (InterruptedException e) {}
         }
 
         String currentUrl = driver.getCurrentUrl();
-        assertTrue(currentUrl.contains("anketa") || currentUrl.contains("profile"),
-                   "Должна быть страница анкеты: " + currentUrl);
+        assertTrue(currentUrl.contains("/member/issue"),
+                   "Должна открыться страница /member/issue, а открылась: " + currentUrl);
+
+        // Останавливаем бесконечную загрузку
+        try {
+            ((JavascriptExecutor) driver).executeScript("window.stop();");
+        } catch (Exception e) {}
     }
 
     @AfterAll

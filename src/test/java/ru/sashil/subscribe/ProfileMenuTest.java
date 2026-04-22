@@ -3,6 +3,7 @@ package ru.sashil.subscribe;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -30,63 +31,47 @@ public class ProfileMenuTest {
         WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--start-maximized");
+        options.setPageLoadStrategy(org.openqa.selenium.PageLoadStrategy.NONE);
         driver = new ChromeDriver(options);
         loginPage = new LoginPage(driver);
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(15));
     }
 
     @BeforeEach
     void login() {
         driver.get(BASE_URL);
         loginPage.login(EMAIL, PASSWORD);
+        By userIcon = By.xpath("//*[@id=\"all\"]/header/ul/li[1]/a");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(userIcon));
+        try { Thread.sleep(1000); } catch (InterruptedException e) {}
     }
 
     @Test
     @DisplayName("Переход в Мой профиль через меню")
     void testGoToProfile() {
-        // Кликаем по иконке человечка
-        By userIcon = By.xpath("//*[@id='all']/header/ul/li[1]/a");
+        By userIcon = By.xpath("//*[@id=\"all\"]/header/ul/li[1]/a");
         wait.until(ExpectedConditions.elementToBeClickable(userIcon)).click();
 
-        // Кликаем по пункту "Мой профиль"
-        By profileBtn = By.xpath("//*[@id='logged_list']/li[1]/a/span[2]");
+        try { Thread.sleep(500); } catch (InterruptedException e) {}
+
+        By profileBtn = By.xpath("//*[@id=\"logged_list\"]/li[1]/a/span[2]");
         wait.until(ExpectedConditions.elementToBeClickable(profileBtn)).click();
 
-        // Ждём загрузки страницы профиля
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+        // Ждём изменения URL
+        long startTime = System.currentTimeMillis();
+        while (!driver.getCurrentUrl().contains("/member/profile") &&
+               (System.currentTimeMillis() - startTime) < 10000) {
+            try { Thread.sleep(500); } catch (InterruptedException e) {}
         }
 
-        // Проверяем, что открылась страница профиля
         String currentUrl = driver.getCurrentUrl();
-        assertTrue(currentUrl.contains("/member/") || currentUrl.contains("/profile"),
-                   "Должна открыться страница профиля: " + currentUrl);
-    }
+        assertTrue(currentUrl.contains("/member/profile"),
+                   "Должна открыться страница /member/profile, а открылась: " + currentUrl);
 
-    @Test
-    @DisplayName("Переход в Мои подписки через меню")
-    void testGoToSubscriptions() {
-        // Кликаем по иконке человечка
-        By userIcon = By.xpath("//*[@id='all']/header/ul/li[1]/a");
-        wait.until(ExpectedConditions.elementToBeClickable(userIcon)).click();
-
-        // Кликаем по пункту "Мои подписки"
-        By subscriptionsBtn = By.xpath("//*[@id='logged_list']/li[2]/a/span[2]");
-        wait.until(ExpectedConditions.elementToBeClickable(subscriptionsBtn)).click();
-
-        // Ждём загрузки
+        // Останавливаем бесконечную загрузку
         try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-
-        // Проверяем, что открылась страница с подписками
-        String currentUrl = driver.getCurrentUrl();
-        assertTrue(currentUrl.contains("/member/") || currentUrl.contains("/manage"),
-                   "Должна открыться страница управления подписками: " + currentUrl);
+            ((JavascriptExecutor) driver).executeScript("window.stop();");
+        } catch (Exception e) {}
     }
 
     @AfterAll

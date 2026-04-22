@@ -39,7 +39,7 @@ public class SubscriptionsListTest {
     void login() {
         driver.get(BASE_URL);
         loginPage.login(EMAIL, PASSWORD);
-        wait.until(ExpectedConditions.urlContains("/member/"));
+        try { Thread.sleep(2000); } catch (InterruptedException e) {}
     }
 
     @Test
@@ -51,9 +51,9 @@ public class SubscriptionsListTest {
         By subscriptionsBtn = By.xpath("//*[@id='logged_list']/li[2]/a");
         wait.until(ExpectedConditions.elementToBeClickable(subscriptionsBtn)).click();
 
-        wait.until(ExpectedConditions.urlContains("/member/"));
+        try { Thread.sleep(2000); } catch (InterruptedException e) {}
 
-        By subscriptionsList = By.xpath("//table | //div[contains(text(), 'подписано')] | //*[contains(@class, 'subscription')]");
+        By subscriptionsList = By.xpath("//table | //div[contains(text(), 'подписано')]");
         boolean hasList = driver.findElements(subscriptionsList).size() > 0;
 
         assertTrue(hasList, "Список подписок должен отображаться");

@@ -8,7 +8,6 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import ru.sashil.subscribe.pages.LoginPage;
 
 import java.time.Duration;
 
@@ -18,12 +17,9 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SubscriptionTest {
 
     private WebDriver driver;
-    private LoginPage loginPage;
     private WebDriverWait wait;
 
     private final String BASE_URL = "https://subscribe.ru/";
-    private final String EMAIL = "hacks.scraper_1r@icloud.com";
-    private final String PASSWORD = "887199";
 
     @BeforeAll
     void setup() {
@@ -31,15 +27,7 @@ public class SubscriptionTest {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--start-maximized");
         driver = new ChromeDriver(options);
-        loginPage = new LoginPage(driver);
         wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-    }
-
-    @BeforeEach
-    void login() {
-        driver.get(BASE_URL);
-        loginPage.login(EMAIL, PASSWORD);
-        wait.until(ExpectedConditions.urlContains("/member/"));
     }
 
     @Test
@@ -48,8 +36,9 @@ public class SubscriptionTest {
         driver.get(BASE_URL + "member/quick?grp=digest.cookery");
 
         By errorMessage = By.xpath("//*[contains(text(), 'Не указан подписной адрес')]");
-        boolean hasError = driver.findElements(errorMessage).size() > 0;
+        wait.until(ExpectedConditions.visibilityOfElementLocated(errorMessage));
 
+        boolean hasError = driver.findElements(errorMessage).size() > 0;
         assertTrue(hasError, "Ожидалась ошибка 'Не указан подписной адрес'");
     }
 
@@ -67,12 +56,12 @@ public class SubscriptionTest {
             By subscribeBtn = By.xpath("//a[contains(@href, '/member/quick') and contains(text(), 'Подписаться')]");
             if (driver.findElements(subscribeBtn).size() > 0) {
                 driver.findElement(subscribeBtn).click();
-                assertTrue(true, "Клик по подписке выполнен");
+                assertTrue(true);
             } else {
-                assertTrue(true, "Кнопка подписки не найдена на этой странице");
+                assertTrue(true);
             }
         } else {
-            assertTrue(true, "Выпуски не найдены");
+            assertTrue(true);
         }
     }
 
