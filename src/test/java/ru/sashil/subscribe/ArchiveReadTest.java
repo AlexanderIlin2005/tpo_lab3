@@ -27,7 +27,6 @@ public class ArchiveReadTest {
     @DisplayName("UC-08: Страница архива открывается")
     void testArchivePageOpens() throws InterruptedException {
         driver.get(ARCHIVE_URL);
-        //Thread.sleep(3000);
 
         String pageSource = driver.getPageSource();
         boolean hasContent = pageSource.contains("archive") || pageSource.length() > 100;
