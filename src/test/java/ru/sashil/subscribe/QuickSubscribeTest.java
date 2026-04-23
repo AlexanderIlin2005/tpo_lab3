@@ -14,7 +14,6 @@ public class QuickSubscribeTest extends BaseTest {
     void testQuickSubscribeError() {
         driver.get(BASE_URL + "member/quick?grp=digest.cookery");
 
-        // Ждём, пока страница загрузится (появление элемента body)
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//body")));
 
         String pageSource = driver.getPageSource();

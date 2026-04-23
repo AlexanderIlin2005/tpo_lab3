@@ -6,6 +6,9 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class Catalog503Test extends BaseTestNoLogin {
 
@@ -21,7 +24,8 @@ public class Catalog503Test extends BaseTestNoLogin {
         boolean isTimeout = false;
 
         try {
-            Thread.sleep(2000);
+            //Thread.sleep(2000);
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//body")));
             String pageSource = driver.getPageSource();
             is503 = pageSource.contains("503") || pageSource.contains("Service Temporarily Unavailable");
         } catch (Exception e) {
