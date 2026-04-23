@@ -45,6 +45,7 @@ public class LoginPage extends BasePage {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+
     }
 
     public String getErrorMessage() {

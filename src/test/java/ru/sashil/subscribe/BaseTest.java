@@ -41,7 +41,6 @@ public abstract class BaseTest {
     void loginBase() {
         driver.get(BASE_URL);
         loginPage.login(EMAIL, PASSWORD);
-        try { Thread.sleep(2000); } catch (InterruptedException e) {}
     }
 
     @AfterAll

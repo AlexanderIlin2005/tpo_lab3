@@ -24,7 +24,6 @@ public class Digest503Test extends BaseTestNoLogin {
         boolean isTimeout = false;
 
         try {
-            //Thread.sleep(2000);
             String pageSource = driver.getPageSource();
             wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//body")));
             is503 = pageSource.contains("503") || pageSource.contains("Service Unavailable") || pageSource.contains("ошибка");
