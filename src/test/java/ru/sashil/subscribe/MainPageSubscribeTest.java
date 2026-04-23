@@ -10,6 +10,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import ru.sashil.subscribe.pages.LoginPage;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.time.Duration;
 
@@ -23,7 +24,6 @@ public class MainPageSubscribeTest {
     private WebDriverWait wait;
     private JavascriptExecutor js;
 
-    // БЕРЁМ ИЗ .ENV
     private final String BASE_URL = ru.sashil.subscribe.utils.EnvLoader.get("BASE_URL");
     private final String EMAIL = ru.sashil.subscribe.utils.EnvLoader.get("EMAIL");
     private final String PASSWORD = ru.sashil.subscribe.utils.EnvLoader.get("PASSWORD");
@@ -44,7 +44,6 @@ public class MainPageSubscribeTest {
     void login() {
         driver.get(BASE_URL);
         loginPage.login(EMAIL, PASSWORD);
-        try { Thread.sleep(2000); } catch (InterruptedException e) {}
     }
 
     @Test
@@ -52,9 +51,8 @@ public class MainPageSubscribeTest {
     void testSubscribeFromMainPage() throws InterruptedException {
         // ШАГ 1: Проверяем, что нет подписок
         driver.get(BASE_URL + "member/issue");
-        Thread.sleep(5000);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//body")));
         js.executeScript("window.stop();");
-        Thread.sleep(500);
 
         String pageSourceBefore = driver.getPageSource();
         boolean hasNoSubscription = pageSourceBefore.contains("Не подписана") || pageSourceBefore.contains("не подписана");
@@ -62,18 +60,20 @@ public class MainPageSubscribeTest {
 
         // ШАГ 2: На главной странице подписываемся на первую рассылку
         driver.get(BASE_URL);
-        Thread.sleep(3000);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//body")));
 
         By subscribeBtn = By.xpath("//a[contains(@class, 'subscriberu_subscribe') and contains(@class, 'subscriberu_notsubscribed')]");
+        wait.until(ExpectedConditions.presenceOfElementLocated(subscribeBtn));
         WebElement firstSubscribe = driver.findElements(subscribeBtn).get(0);
         js.executeScript("arguments[0].click();", firstSubscribe);
-        Thread.sleep(2000);
+
+        // Ждём, пока кнопка изменит состояние (станет "Отписаться" или исчезнет)
+        Thread.sleep(2000); // Здесь оставляем, так как нужно дождаться AJAX-ответа
 
         // ШАГ 3: Проверяем, что подписка появилась
         driver.get(BASE_URL + "member/issue");
-        Thread.sleep(5000);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//body")));
         js.executeScript("window.stop();");
-        Thread.sleep(500);
 
         String pageSourceAfter = driver.getPageSource();
         boolean hasSubscription = pageSourceAfter.contains("подписчик") || pageSourceAfter.contains("Отписаться");
@@ -83,14 +83,13 @@ public class MainPageSubscribeTest {
         By unsubscribeBtn = By.xpath("//*[@id=\"all\"]/section/div[2]/div/div/div[1]/div[4]/div/span/a");
         if (driver.findElements(unsubscribeBtn).size() > 0) {
             js.executeScript("arguments[0].click();", driver.findElement(unsubscribeBtn));
-            Thread.sleep(2000);
+            Thread.sleep(2000); // Ждём AJAX-ответ
         }
 
         // ШАГ 5: Проверяем, что подписок снова нет
         driver.navigate().refresh();
-        Thread.sleep(5000);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//body")));
         js.executeScript("window.stop();");
-        Thread.sleep(500);
 
         String pageSourceFinal = driver.getPageSource();
         boolean hasNoSubscriptionAgain = pageSourceFinal.contains("Не подписана") || pageSourceFinal.contains("не подписана");
