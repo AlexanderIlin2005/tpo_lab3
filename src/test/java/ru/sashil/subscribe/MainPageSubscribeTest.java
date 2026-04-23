@@ -8,7 +8,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import ru.sashil.subscribe.pages.LoginPage;
 
@@ -24,9 +23,10 @@ public class MainPageSubscribeTest {
     private WebDriverWait wait;
     private JavascriptExecutor js;
 
-    private final String BASE_URL = "https://subscribe.ru/";
-    private final String EMAIL = "hacks.scraper_1r@icloud.com";
-    private final String PASSWORD = "887199";
+    // БЕРЁМ ИЗ .ENV
+    private final String BASE_URL = ru.sashil.subscribe.utils.EnvLoader.get("BASE_URL");
+    private final String EMAIL = ru.sashil.subscribe.utils.EnvLoader.get("EMAIL");
+    private final String PASSWORD = ru.sashil.subscribe.utils.EnvLoader.get("PASSWORD");
 
     @BeforeAll
     void setup() {

@@ -1,58 +1,34 @@
 package ru.sashil.subscribe;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class Catalog503Test {
+public class Catalog503Test extends BaseTestNoLogin {
 
-    private WebDriver driver;
-    private final String CATALOG_URL = "https://subscribe.ru/catalog/";
-
-    @BeforeAll
-    void setup() {
-        WebDriverManager.chromedriver().setup();
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--start-maximized");
-        options.setPageLoadStrategy(org.openqa.selenium.PageLoadStrategy.NONE);
-        driver = new ChromeDriver(options);
-    }
+    private final String CATALOG_URL = BASE_URL + "catalog/";
 
     @Test
     @DisplayName("UC-11: Каталог рассылок возвращает 503 ошибку или зависает")
     void testCatalogReturns503() throws InterruptedException {
-        // Устанавливаем таймаут 5 секунд
         driver.manage().timeouts().pageLoadTimeout(5, TimeUnit.SECONDS);
+        driver.get(CATALOG_URL);
 
         boolean is503 = false;
         boolean isTimeout = false;
 
         try {
-            driver.get(CATALOG_URL);
             Thread.sleep(2000);
             String pageSource = driver.getPageSource();
-            is503 = pageSource.contains("503") ||
-                    pageSource.contains("Service Temporarily Unavailable");
+            is503 = pageSource.contains("503") || pageSource.contains("Service Temporarily Unavailable");
         } catch (Exception e) {
-            // Если таймаут или ошибка — это тоже нормально для 503
-            isTimeout = e.getMessage().contains("timeout") ||
-                        e.getMessage().contains("Timeout") ||
-                        e instanceof org.openqa.selenium.TimeoutException;
+            isTimeout = e.getMessage().contains("timeout") || e instanceof org.openqa.selenium.TimeoutException;
         }
 
         boolean hasError = is503 || isTimeout;
         assertTrue(hasError, "Каталог должен возвращать 503 ошибку или зависать");
-    }
-
-    @AfterAll
-    void tearDown() {
-        if (driver != null) driver.quit();
     }
 }
