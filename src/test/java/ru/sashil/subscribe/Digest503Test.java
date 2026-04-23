@@ -6,6 +6,9 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class Digest503Test extends BaseTestNoLogin {
 
@@ -21,8 +24,9 @@ public class Digest503Test extends BaseTestNoLogin {
         boolean isTimeout = false;
 
         try {
-            Thread.sleep(2000);
+            //Thread.sleep(2000);
             String pageSource = driver.getPageSource();
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//body")));
             is503 = pageSource.contains("503") || pageSource.contains("Service Unavailable") || pageSource.contains("ошибка");
         } catch (Exception e) {
             isTimeout = e.getMessage().contains("timeout") || e instanceof org.openqa.selenium.TimeoutException;
