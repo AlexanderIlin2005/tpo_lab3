@@ -14,12 +14,15 @@ public class LoginPage extends BasePage {
     private final By passwordField = By.xpath("//*[@id='credential_1']");
     private final By loginButton = By.xpath("//input[@value='Войти' and @type='submit']");
     private final By errorMessage = By.xpath("//*[@id='auth_msg']/font");
+    private final By profileIndicator = By.xpath("//*[@id='all']/header/ul/li[1]/a"); // иконка человечка после входа
 
     public LoginPage(WebDriver driver) {
         super(driver);
     }
 
     public void login(String email, String password) {
+        WebDriverWait longWait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
         // Кликаем по иконке человечка
         wait.waitForClickable(userIcon);
         driver.findElement(userIcon).click();
@@ -27,11 +30,11 @@ public class LoginPage extends BasePage {
         // Ждём появления формы
         wait.waitForVisible(emailField);
 
-        // Очищаем и вводим email
+        // Вводим email
         driver.findElement(emailField).clear();
         driver.findElement(emailField).sendKeys(email);
 
-        // Очищаем и вводим пароль
+        // Вводим пароль
         driver.findElement(passwordField).clear();
         driver.findElement(passwordField).sendKeys(password);
 
@@ -39,13 +42,17 @@ public class LoginPage extends BasePage {
         wait.waitForClickable(loginButton);
         driver.findElement(loginButton).click();
 
-        // Ждём завершения (либо редиректа, либо сообщения об ошибке)
+        // Ждём, пока форма логина исчезнет (станет невидимой)
+        // Это основной признак успешного входа
         try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            longWait.until(ExpectedConditions.invisibilityOfElementLocated(emailField));
+        } catch (Exception e) {
+            // Если форма не исчезла, проверяем наличие сообщения об ошибке
+            if (driver.findElements(errorMessage).size() == 0) {
+                // Если нет ни ошибки, просто ждём немного
+                try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
+            }
         }
-
     }
 
     public String getErrorMessage() {
