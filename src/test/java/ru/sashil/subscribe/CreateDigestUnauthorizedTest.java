@@ -13,7 +13,6 @@ public class CreateDigestUnauthorizedTest extends BaseTestNoLogin {
     @DisplayName("UC-09: Создание рассылки (неавторизованный пользователь - форма логина)")
     void testCreateDigestUnauthorized() throws InterruptedException {
         driver.get(BASE_URL);
-        Thread.sleep(1000);
 
         By createDigestBtn = By.xpath("//*[@id='all']/section/div[1]/div/div/a[1]");
         wait.until(ExpectedConditions.elementToBeClickable(createDigestBtn)).click();
