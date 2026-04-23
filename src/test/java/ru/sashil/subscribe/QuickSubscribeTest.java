@@ -2,24 +2,18 @@ package ru.sashil.subscribe;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import ru.sashil.subscribe.pages.LoginPage;
-
-import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ProfileTest {
+public class QuickSubscribeTest {
 
     private WebDriver driver;
     private LoginPage loginPage;
-    private WebDriverWait wait;
 
     private final String BASE_URL = "https://subscribe.ru/";
     private final String EMAIL = "hacks.scraper_1r@icloud.com";
@@ -32,7 +26,6 @@ public class ProfileTest {
         options.addArguments("--start-maximized");
         driver = new ChromeDriver(options);
         loginPage = new LoginPage(driver);
-        wait = new WebDriverWait(driver, Duration.ofSeconds(15));
     }
 
     @BeforeEach
@@ -43,25 +36,15 @@ public class ProfileTest {
     }
 
     @Test
-    @DisplayName("UC-02: Заполнение анкеты подписчика")
-    void testFillQuestionnaire() throws InterruptedException {
-        By userIcon = By.xpath("//*[@id='all']/header/ul/li[1]/a");
-        wait.until(ExpectedConditions.elementToBeClickable(userIcon)).click();
-
-        By profileBtn = By.xpath("//*[@id='logged_list']/li[1]/a");
-        wait.until(ExpectedConditions.elementToBeClickable(profileBtn)).click();
-
+    @DisplayName("UC-04: Быстрая подписка - ожидается ошибка")
+    void testQuickSubscribeError() throws InterruptedException {
+        driver.get(BASE_URL + "member/quick?grp=digest.cookery");
         Thread.sleep(2000);
 
-        By anketaLink = By.xpath("//a[contains(@href, 'anketa') or contains(text(), 'Анкета')]");
-        if (driver.findElements(anketaLink).size() > 0) {
-            driver.findElement(anketaLink).click();
-            Thread.sleep(1000);
-        }
+        String pageSource = driver.getPageSource();
+        boolean hasError = pageSource.contains("Не указан подписной адрес");
 
-        String currentUrl = driver.getCurrentUrl();
-        assertTrue(currentUrl.contains("anketa") || currentUrl.contains("profile"),
-                   "Должна быть страница анкеты: " + currentUrl);
+        assertTrue(hasError, "На странице должна быть надпись 'Не указан подписной адрес'");
     }
 
     @AfterAll
