@@ -18,8 +18,6 @@ public class LogoutTest extends BaseTest {
         By logoutBtn = By.xpath("//*[@id='logged_list']/li[9]/a");
         wait.until(ExpectedConditions.elementToBeClickable(logoutBtn)).click();
 
-        try { Thread.sleep(2000); } catch (InterruptedException e) {}
-
         By userIconAfterLogout = By.xpath("//*[@id='all']/header/ul/li[1]/a");
         assertTrue(driver.findElements(userIconAfterLogout).size() > 0,
                    "После выхода иконка человечка должна быть видна");
