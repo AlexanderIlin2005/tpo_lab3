@@ -21,6 +21,7 @@ public class SubscriptionsMenuTest {
     private WebDriver driver;
     private LoginPage loginPage;
     private WebDriverWait wait;
+    private JavascriptExecutor js;
 
     private final String BASE_URL = "https://subscribe.ru/";
     private final String EMAIL = "hacks.scraper_1r@icloud.com";
@@ -35,6 +36,7 @@ public class SubscriptionsMenuTest {
         driver = new ChromeDriver(options);
         loginPage = new LoginPage(driver);
         wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+        js = (JavascriptExecutor) driver;
     }
 
     @BeforeEach
@@ -43,35 +45,26 @@ public class SubscriptionsMenuTest {
         loginPage.login(EMAIL, PASSWORD);
         By userIcon = By.xpath("//*[@id=\"all\"]/header/ul/li[1]/a");
         wait.until(ExpectedConditions.visibilityOfElementLocated(userIcon));
-        try { Thread.sleep(1000); } catch (InterruptedException e) {}
     }
 
     @Test
-    @DisplayName("Переход в Мои подписки через меню")
+    @DisplayName("UC-06: Переход в Мои подписки через меню")
     void testGoToSubscriptions() {
         By userIcon = By.xpath("//*[@id=\"all\"]/header/ul/li[1]/a");
         wait.until(ExpectedConditions.elementToBeClickable(userIcon)).click();
-
-        try { Thread.sleep(500); } catch (InterruptedException e) {}
 
         By subscriptionsBtn = By.xpath("//*[@id=\"logged_list\"]/li[2]/a/span[2]");
         wait.until(ExpectedConditions.elementToBeClickable(subscriptionsBtn)).click();
 
         // Ждём изменения URL
-        long startTime = System.currentTimeMillis();
-        while (!driver.getCurrentUrl().contains("/member/issue") &&
-               (System.currentTimeMillis() - startTime) < 10000) {
-            try { Thread.sleep(500); } catch (InterruptedException e) {}
-        }
+        wait.until(ExpectedConditions.urlContains("/member/issue"));
 
         String currentUrl = driver.getCurrentUrl();
         assertTrue(currentUrl.contains("/member/issue"),
                    "Должна открыться страница /member/issue, а открылась: " + currentUrl);
 
         // Останавливаем бесконечную загрузку
-        try {
-            ((JavascriptExecutor) driver).executeScript("window.stop();");
-        } catch (Exception e) {}
+        js.executeScript("window.stop();");
     }
 
     @AfterAll

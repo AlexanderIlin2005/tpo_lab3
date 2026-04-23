@@ -8,7 +8,11 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import ru.sashil.subscribe.pages.LoginPage;
+
+import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -17,6 +21,7 @@ public class MainPageSubscribeTest {
 
     private WebDriver driver;
     private LoginPage loginPage;
+    private WebDriverWait wait;
     private JavascriptExecutor js;
 
     private final String BASE_URL = "https://subscribe.ru/";
@@ -31,6 +36,7 @@ public class MainPageSubscribeTest {
         options.setPageLoadStrategy(org.openqa.selenium.PageLoadStrategy.NONE);
         driver = new ChromeDriver(options);
         loginPage = new LoginPage(driver);
+        wait = new WebDriverWait(driver, Duration.ofSeconds(15));
         js = (JavascriptExecutor) driver;
     }
 
@@ -44,22 +50,14 @@ public class MainPageSubscribeTest {
     @Test
     @DisplayName("UC-05: Подписка через главную страницу")
     void testSubscribeFromMainPage() throws InterruptedException {
-        // ШАГ 1: Проверяем, что нет подписок (даём странице 5 секунд на отрисовку)
+        // ШАГ 1: Проверяем, что нет подписок
         driver.get(BASE_URL + "member/issue");
-        Thread.sleep(5000);  // Ждём появления контента
+        Thread.sleep(5000);
         js.executeScript("window.stop();");
         Thread.sleep(500);
 
-        // Ищем надпись через contains (более гибко)
-        By noSubscriptionText = By.xpath("//*[contains(text(), 'Не подписана') or contains(text(), 'не подписана')]");
-        boolean hasNoSubscription = driver.findElements(noSubscriptionText).size() > 0;
-
-        // Если не нашли, проверяем через pageSource
-        if (!hasNoSubscription) {
-            String pageSource = driver.getPageSource();
-            hasNoSubscription = pageSource.contains("Не подписана") || pageSource.contains("не подписана");
-        }
-
+        String pageSourceBefore = driver.getPageSource();
+        boolean hasNoSubscription = pageSourceBefore.contains("Не подписана") || pageSourceBefore.contains("не подписана");
         assertTrue(hasNoSubscription, "До подписки должна быть надпись об отсутствии подписок");
 
         // ШАГ 2: На главной странице подписываемся на первую рассылку
@@ -77,14 +75,8 @@ public class MainPageSubscribeTest {
         js.executeScript("window.stop();");
         Thread.sleep(500);
 
-        By subscriptionSpan = By.xpath("//*[@id=\"all\"]/section/div[2]/div/div/div[1]/div[4]/div/span/span");
-        boolean hasSubscription = driver.findElements(subscriptionSpan).size() > 0;
-
-        if (!hasSubscription) {
-            String pageSource = driver.getPageSource();
-            hasSubscription = pageSource.contains("подписчик") || pageSource.contains("Отписаться");
-        }
-
+        String pageSourceAfter = driver.getPageSource();
+        boolean hasSubscription = pageSourceAfter.contains("подписчик") || pageSourceAfter.contains("Отписаться");
         assertTrue(hasSubscription, "Подписка должна появиться в списке");
 
         // ШАГ 4: Отписываемся
@@ -100,13 +92,8 @@ public class MainPageSubscribeTest {
         js.executeScript("window.stop();");
         Thread.sleep(500);
 
-        boolean hasNoSubscriptionAgain = driver.findElements(noSubscriptionText).size() > 0;
-
-        if (!hasNoSubscriptionAgain) {
-            String pageSource = driver.getPageSource();
-            hasNoSubscriptionAgain = pageSource.contains("Не подписана") || pageSource.contains("не подписана");
-        }
-
+        String pageSourceFinal = driver.getPageSource();
+        boolean hasNoSubscriptionAgain = pageSourceFinal.contains("Не подписана") || pageSourceFinal.contains("не подписана");
         assertTrue(hasNoSubscriptionAgain, "После отписки снова должна быть надпись об отсутствии подписок");
     }
 

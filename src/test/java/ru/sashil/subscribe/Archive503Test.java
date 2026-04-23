@@ -2,7 +2,6 @@ package ru.sashil.subscribe;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.*;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -10,7 +9,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ArchiveReadTest {
+public class Archive503Test {
 
     private WebDriver driver;
     private final String ARCHIVE_URL = "https://subscribe.ru/archive/";
@@ -24,15 +23,16 @@ public class ArchiveReadTest {
     }
 
     @Test
-    @DisplayName("UC-08: Страница архива открывается")
-    void testArchivePageOpens() throws InterruptedException {
+    @DisplayName("UC-12: Архив рассылок возвращает 503 ошибку")
+    void testArchiveReturns503() {
         driver.get(ARCHIVE_URL);
-        Thread.sleep(3000);
 
         String pageSource = driver.getPageSource();
-        boolean hasContent = pageSource.contains("archive") || pageSource.length() > 100;
+        boolean has503 = pageSource.contains("503") ||
+                         pageSource.contains("Service Temporarily Unavailable") ||
+                         driver.getTitle().contains("503");
 
-        assertTrue(hasContent, "Страница архива должна открываться");
+        assertTrue(has503, "Архив должен возвращать 503 ошибку");
     }
 
     @AfterAll
