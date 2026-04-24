@@ -51,7 +51,7 @@ public class MainPageSubscribeTest {
     void testSubscribeFromMainPage() {
         By noSubscriptionText = By.xpath("//*[contains(text(), 'Не подписана') or contains(text(), 'не подписана')]");
 
-        // ШАГ 1: Проверяем, что нет подписок
+
         driver.get(BASE_URL + "member/issue");
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//body")));
         js.executeScript("window.stop();");
@@ -60,7 +60,7 @@ public class MainPageSubscribeTest {
         boolean hasNoSubscription = pageSourceBefore.contains("Не подписана") || pageSourceBefore.contains("не подписана");
         assertTrue(hasNoSubscription, "До подписки должна быть надпись об отсутствии подписок");
 
-        // ШАГ 2: На главной странице подписываемся на первую рассылку
+
         driver.get(BASE_URL);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//body")));
 
@@ -69,11 +69,11 @@ public class MainPageSubscribeTest {
         WebElement firstSubscribe = driver.findElements(subscribeBtn).get(0);
         js.executeScript("arguments[0].click();", firstSubscribe);
 
-        // Ждём, пока кнопка изменит класс (станет subscribed)
+
         By subscribedBtn = By.xpath("//a[contains(@class, 'subscriberu_subscribed')]");
         wait.until(ExpectedConditions.presenceOfElementLocated(subscribedBtn));
 
-        // ШАГ 3: Проверяем, что подписка появилась
+
         driver.get(BASE_URL + "member/issue");
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//body")));
         js.executeScript("window.stop();");
@@ -82,13 +82,13 @@ public class MainPageSubscribeTest {
         boolean hasSubscription = pageSourceAfter.contains("подписчик") || pageSourceAfter.contains("Отписаться");
         assertTrue(hasSubscription, "Подписка должна появиться в списке");
 
-        // ШАГ 4: Отписываемся
+
         By unsubscribeBtn = By.xpath("//*[@id=\"all\"]/section/div[2]/div/div/div[1]/div[4]/div/span/a");
         if (driver.findElements(unsubscribeBtn).size() > 0) {
             js.executeScript("arguments[0].click();", driver.findElement(unsubscribeBtn));
         }
 
-        // ШАГ 5: Выходим на главную страницу, потом обратно в подписки
+
         driver.get(BASE_URL);
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//body")));
 
@@ -96,7 +96,7 @@ public class MainPageSubscribeTest {
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//body")));
         js.executeScript("window.stop();");
 
-        // ШАГ 6: Проверяем, что надпись появилась
+
         String pageSourceFinal = driver.getPageSource();
         boolean hasNoSubscriptionAgain = pageSourceFinal.contains("Не подписана") || pageSourceFinal.contains("не подписана");
         assertTrue(hasNoSubscriptionAgain, "После отписки снова должна быть надпись об отсутствии подписок");

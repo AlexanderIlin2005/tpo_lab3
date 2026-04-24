@@ -39,7 +39,6 @@ public class Catalog503Test {
                              pageSource.contains("Service Temporarily Unavailable") ||
                              pageSource.contains("Service Unavailable");
             if (!has503) {
-                // Если нет 503, но страница не зависла - считаем успехом
                 assertTrue(true);
             }
         } catch (Exception e) {
