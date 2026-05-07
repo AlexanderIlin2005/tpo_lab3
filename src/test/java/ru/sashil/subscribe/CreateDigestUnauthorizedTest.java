@@ -1,7 +1,6 @@
 package ru.sashil.subscribe;
 
 import org.junit.jupiter.api.*;
-import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -11,26 +10,12 @@ public class CreateDigestUnauthorizedTest extends BaseTestNoLogin {
 
     @Test
     @DisplayName("UC-09: Создание рассылки (неавторизованный пользователь - форма логина)")
-    void testCreateDigestUnauthorized() throws InterruptedException {
+    void testCreateDigestUnauthorized() {
         driver.get(BASE_URL);
-
-        By createDigestBtn = By.xpath("//*[@id='all']/section/div[1]/div/div/a[1]");
-        wait.until(ExpectedConditions.elementToBeClickable(createDigestBtn)).click();
-
+        createDigestPage.clickCreateDigest();
         wait.until(ExpectedConditions.urlContains("/member/list/new"));
-
-        String currentUrl = driver.getCurrentUrl();
-        assertTrue(currentUrl.contains("/member/list/new"),
-                   "Должна открыться страница создания рассылки: " + currentUrl);
-
-        By emailField = By.xpath("//*[@id=\"credential_0\"]");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(emailField));
-
-        boolean hasLoginForm = driver.findElements(emailField).size() > 0;
-        assertTrue(hasLoginForm, "Неавторизованный пользователь должен видеть форму логина");
-
-        By passwordField = By.xpath("//*[@id=\"credential_1\"]");
-        boolean hasPasswordField = driver.findElements(passwordField).size() > 0;
-        assertTrue(hasPasswordField, "Поле пароля также должно быть видно");
+        assertTrue(driver.getCurrentUrl().contains("/member/list/new"), "Должна открыться страница создания рассылки");
+        assertTrue(createDigestPage.isLoginFormVisible(), "Неавторизованный пользователь должен видеть форму логина");
+        assertTrue(createDigestPage.hasLoginForm(), "Поле пароля также должно быть видно");
     }
 }

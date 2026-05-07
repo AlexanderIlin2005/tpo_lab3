@@ -1,7 +1,6 @@
 package ru.sashil.subscribe;
 
 import org.junit.jupiter.api.*;
-import org.openqa.selenium.By;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -11,20 +10,11 @@ public class CreateDigestAuthorizedTest extends BaseTest {
 
     @Test
     @DisplayName("UC-09: Создание рассылки (авторизованный пользователь)")
-    void testCreateDigestAuthorized() throws InterruptedException {
+    void testCreateDigestAuthorized() {
         driver.get(BASE_URL);
-
-        By createDigestBtn = By.xpath("//*[@id='all']/section/div[1]/div/div/a[1]");
-        wait.until(ExpectedConditions.elementToBeClickable(createDigestBtn)).click();
-
+        createDigestPage.clickCreateDigest();
         wait.until(ExpectedConditions.urlContains("/member/list/new"));
-
-        String currentUrl = driver.getCurrentUrl();
-        assertTrue(currentUrl.contains("/member/list/new"),
-                   "Должна открыться страница создания рассылки: " + currentUrl);
-
-        By emailField = By.xpath("//*[@id=\"credential_0\"]");
-        boolean hasLoginForm = driver.findElements(emailField).size() > 0;
-        assertFalse(hasLoginForm, "Авторизованный пользователь не должен видеть форму логина");
+        assertTrue(driver.getCurrentUrl().contains("/member/list/new"), "Должна открыться страница создания рассылки");
+        assertFalse(createDigestPage.hasLoginForm(), "Авторизованный пользователь не должен видеть форму логина");
     }
 }

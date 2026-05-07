@@ -9,7 +9,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import ru.sashil.subscribe.pages.LoginPage;
+import ru.sashil.subscribe.pages.*;
 import ru.sashil.subscribe.utils.EnvLoader;
 
 import java.time.Duration;
@@ -20,6 +20,10 @@ public abstract class BaseTest {
     protected static WebDriverWait wait;
     protected static JavascriptExecutor js;
     protected static LoginPage loginPage;
+    protected static ProfileMenuPage profileMenuPage;
+    protected static MemberIssuePage memberIssuePage;
+    protected static MainPage mainPage;
+    protected static CreateDigestPage createDigestPage;
 
     protected static final String BASE_URL = EnvLoader.get("BASE_URL");
     protected static final String EMAIL = EnvLoader.get("EMAIL");
@@ -35,6 +39,10 @@ public abstract class BaseTest {
         wait = new WebDriverWait(driver, Duration.ofSeconds(15));
         js = (JavascriptExecutor) driver;
         loginPage = new LoginPage(driver);
+        profileMenuPage = new ProfileMenuPage(driver);
+        memberIssuePage = new MemberIssuePage(driver);
+        mainPage = new MainPage(driver);
+        createDigestPage = new CreateDigestPage(driver);
     }
 
     @BeforeEach

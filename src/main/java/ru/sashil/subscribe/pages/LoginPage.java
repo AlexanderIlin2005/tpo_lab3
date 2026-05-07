@@ -14,48 +14,46 @@ public class LoginPage extends BasePage {
     private final By passwordField = By.xpath("//*[@id='credential_1']");
     private final By loginButton = By.xpath("//input[@value='Войти' and @type='submit']");
     private final By errorMessage = By.xpath("//*[@id='auth_msg']/font");
-    private final By profileIndicator = By.xpath("//*[@id='all']/header/ul/li[1]/a"); // иконка человечка после входа
+    private final By successIndicator = By.xpath("//a[contains(@href, '/member/')] | //div[contains(text(), 'Мои подписки')]");
 
     public LoginPage(WebDriver driver) {
         super(driver);
     }
 
-    public void login(String email, String password) {
-        WebDriverWait longWait = new WebDriverWait(driver, Duration.ofSeconds(10));
-
-        // Кликаем по иконке человечка
+    public void clickUserIcon() {
         wait.waitForClickable(userIcon);
         driver.findElement(userIcon).click();
-
-        // Ждём появления формы
-        wait.waitForVisible(emailField);
-
-        // Вводим email
-        driver.findElement(emailField).clear();
-        driver.findElement(emailField).sendKeys(email);
-
-        // Вводим пароль
-        driver.findElement(passwordField).clear();
-        driver.findElement(passwordField).sendKeys(password);
-
-        // Нажимаем кнопку входа
-        wait.waitForClickable(loginButton);
-        driver.findElement(loginButton).click();
-
-        // Ждём, пока форма логина исчезнет (станет невидимой)
-        // Это основной признак успешного входа
-        try {
-            longWait.until(ExpectedConditions.invisibilityOfElementLocated(emailField));
-        } catch (Exception e) {
-            // Если форма не исчезла, проверяем наличие сообщения об ошибке
-            if (driver.findElements(errorMessage).size() == 0) {
-                // Если нет ни ошибки, просто ждём немного
-                try { Thread.sleep(1000); } catch (InterruptedException ignored) {}
-            }
-        }
     }
 
-    public String getErrorMessage() {
+    public void enterEmail(String email) {
+        wait.waitForVisible(emailField);
+        driver.findElement(emailField).clear();
+        driver.findElement(emailField).sendKeys(email);
+    }
+
+    public void enterPassword(String password) {
+        driver.findElement(passwordField).clear();
+        driver.findElement(passwordField).sendKeys(password);
+    }
+
+    public void clickLoginButton() {
+        wait.waitForClickable(loginButton);
+        driver.findElement(loginButton).click();
+    }
+
+    public String getEnteredEmail() {
+        return driver.findElement(emailField).getAttribute("value");
+    }
+
+    public boolean isEmailFieldDisplayed() {
+        return driver.findElements(emailField).size() > 0;
+    }
+
+    public boolean isPasswordFieldDisplayed() {
+        return driver.findElements(passwordField).size() > 0;
+    }
+
+    public String getErrorMessageText() {
         if (driver.findElements(errorMessage).size() > 0) {
             return driver.findElement(errorMessage).getText();
         }
@@ -66,12 +64,19 @@ public class LoginPage extends BasePage {
         return driver.findElements(errorMessage).size() > 0;
     }
 
-    public boolean isFormDisplayed() {
-        return driver.findElements(emailField).size() > 0 &&
-               driver.findElements(passwordField).size() > 0;
+    public boolean isLoginSuccessful() {
+        return driver.findElements(successIndicator).size() > 0;
     }
 
-    public String getEnteredEmail() {
-        return driver.findElement(emailField).getAttribute("value");
+    public void login(String email, String password) {
+        clickUserIcon();
+        enterEmail(email);
+        enterPassword(password);
+        clickLoginButton();
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 }
