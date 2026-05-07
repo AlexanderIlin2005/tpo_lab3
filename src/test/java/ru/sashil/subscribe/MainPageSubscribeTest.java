@@ -34,9 +34,9 @@ public class MainPageSubscribeTest extends BaseTest {
 
         assertTrue(issuePage.hasSubscription(), "Подписка должна появиться в списке");
 
-        // ШАГ 4: Отписываемся
+        // ШАГ 4: Отписываемся через JS
         if (issuePage.hasUnsubscribeButton()) {
-            issuePage.clickUnsubscribe();
+            issuePage.clickUnsubscribeViaJS();
         }
 
         // ШАГ 5: Выходим на главную, потом снова в подписки (только так обновляется состояние)

@@ -49,4 +49,10 @@ public class IssuePage extends BasePage {
     public String getPageSource() {
         return driver.getPageSource();
     }
+
+    public void clickUnsubscribeViaJS() {
+        if (hasUnsubscribeButton()) {
+            ((org.openqa.selenium.JavascriptExecutor) driver).executeScript("arguments[0].click();", driver.findElement(unsubscribeBtn));
+        }
+    }
 }
