@@ -37,7 +37,6 @@ public class Catalog503Test {
                              pageSource.contains("Service Temporarily Unavailable") ||
                              pageSource.contains("Service Unavailable");
             if (!has503) {
-                // Страница открылась (200 OK) - тест помечаем как пройденный (skip)
                 System.out.println("Catalog page loaded successfully (200 OK) - test skipped as expected behavior changed");
                 assertTrue(true);
             } else {

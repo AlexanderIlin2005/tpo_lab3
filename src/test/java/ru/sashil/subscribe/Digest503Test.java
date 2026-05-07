@@ -37,7 +37,6 @@ public class Digest503Test {
                              pageSource.contains("Service Temporarily Unavailable") ||
                              pageSource.contains("Service Unavailable");
             if (!has503) {
-                // Страница открылась (200 OK) - тест помечаем как пройденный (skip)
                 System.out.println("Digest page loaded successfully (200 OK) - test skipped as expected behavior changed");
                 assertTrue(true);
             } else {
