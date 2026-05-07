@@ -25,11 +25,11 @@ public class LoginTest extends BaseTestNoLogin {
         driver.get(BASE_URL);
         loginPage.clickUserIcon();
         loginPage.enterEmail("wrong@email.com");
-        loginPage.enterPassword(PASSWORD);
+        loginPage.enterPassword(EnvLoader.get("PASSWORD"));
         loginPage.clickLoginButton();
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(org.openqa.selenium.By.xpath("//*[@id='auth_msg']/font")));
-        
+        wait.until(ExpectedConditions.visibilityOfElementLocated(loginPage.getErrorMessageLocator()));
+
         String errorText = loginPage.getErrorMessageText();
         assertTrue(errorText.contains("не зарегистрирован"), "Сообщение об ошибке не соответствует ожидаемому: " + errorText);
         assertTrue(loginPage.isEmailFieldDisplayed(), "Форма должна оставаться открытой");
@@ -45,8 +45,8 @@ public class LoginTest extends BaseTestNoLogin {
         loginPage.enterPassword(WRONG_PASSWORD);
         loginPage.clickLoginButton();
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(org.openqa.selenium.By.xpath("//*[@id='auth_msg']/font")));
-        
+        wait.until(ExpectedConditions.visibilityOfElementLocated(loginPage.getErrorMessageLocator()));
+
         String errorText = loginPage.getErrorMessageText();
         assertTrue(errorText.contains("неверный пароль"), "Сообщение об ошибке не соответствует ожидаемому: " + errorText);
         assertTrue(loginPage.isEmailFieldDisplayed(), "Форма должна оставаться открытой");

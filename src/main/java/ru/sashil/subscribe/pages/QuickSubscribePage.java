@@ -23,4 +23,8 @@ public class QuickSubscribePage extends BasePage {
     public String getPageSource() {
         return driver.getPageSource();
     }
+
+    public By getBodyLocator() {
+        return bodyLocator;
+    }
 }

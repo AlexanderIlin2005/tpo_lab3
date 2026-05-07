@@ -11,9 +11,9 @@ public class QuickSubscribeTest extends BaseTest {
     @Test
     @DisplayName("UC-04: Быстрая подписка - ожидается ошибка")
     void testQuickSubscribeError() {
-        driver.get(BASE_URL + "member/quick?grp=digest.cookery");
-        wait.until(ExpectedConditions.visibilityOfElementLocated(org.openqa.selenium.By.xpath("//body")));
-        String pageSource = driver.getPageSource();
+        quickSubscribePage.openQuickSubscribe();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(quickSubscribePage.getBodyLocator()));
+        String pageSource = quickSubscribePage.getPageSource();
         boolean hasError = pageSource.contains("Не указан подписной адрес");
         assertTrue(hasError, "На странице должна быть надпись 'Не указан подписной адрес'");
     }

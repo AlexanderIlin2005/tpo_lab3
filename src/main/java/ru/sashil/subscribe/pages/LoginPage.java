@@ -79,4 +79,8 @@ public class LoginPage extends BasePage {
             Thread.currentThread().interrupt();
         }
     }
+
+    public org.openqa.selenium.By getErrorMessageLocator() {
+        return errorMessage;
+    }
 }

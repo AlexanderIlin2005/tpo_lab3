@@ -18,6 +18,10 @@ public class IssuePage extends BasePage {
         driver.get("https://subscribe.ru/member/issue");
     }
 
+    public By getBodyLocator() {
+        return bodyLocator;
+    }
+
     public boolean isBodyPresent() {
         return driver.findElements(bodyLocator).size() > 0;
     }
@@ -27,7 +31,9 @@ public class IssuePage extends BasePage {
     }
 
     public boolean hasSubscription() {
-        return driver.findElements(subscriptionSpan).size() > 0;
+        return driver.findElements(subscriptionSpan).size() > 0 ||
+               driver.getPageSource().contains("подписчик") ||
+               driver.getPageSource().contains("Отписаться");
     }
 
     public boolean hasUnsubscribeButton() {

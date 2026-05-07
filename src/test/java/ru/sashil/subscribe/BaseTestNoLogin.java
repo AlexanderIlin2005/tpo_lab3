@@ -23,6 +23,11 @@ public abstract class BaseTestNoLogin {
     protected static MemberIssuePage memberIssuePage;
     protected static MainPage mainPage;
     protected static CreateDigestPage createDigestPage;
+    protected static QuickSubscribePage quickSubscribePage;
+    protected static IssuePage issuePage;
+    protected static ArchivePage archivePage;
+    protected static CatalogPage catalogPage;
+    protected static DigestPage503 digestPage503;
 
     protected static final String BASE_URL = EnvLoader.get("BASE_URL");
     protected static final String EMAIL = EnvLoader.get("EMAIL");
@@ -41,6 +46,11 @@ public abstract class BaseTestNoLogin {
         memberIssuePage = new MemberIssuePage(driver);
         mainPage = new MainPage(driver);
         createDigestPage = new CreateDigestPage(driver);
+        quickSubscribePage = new QuickSubscribePage(driver);
+        issuePage = new IssuePage(driver);
+        archivePage = new ArchivePage(driver);
+        catalogPage = new CatalogPage(driver);
+        digestPage503 = new DigestPage503(driver);
     }
 
     @AfterAll

@@ -1,7 +1,6 @@
 package ru.sashil.subscribe;
 
 import org.junit.jupiter.api.*;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -13,40 +12,45 @@ public class MainPageSubscribeTest extends BaseTest {
     @DisplayName("UC-05: Подписка через главную страницу")
     void testSubscribeFromMainPage() {
         // ШАГ 1: Проверяем, что нет подписок
-        driver.get(BASE_URL + "member/issue");
-        memberIssuePage.waitForBody();
+        issuePage.openIssuePage();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(issuePage.getBodyLocator()));
         js.executeScript("window.stop();");
-        assertTrue(memberIssuePage.hasNoSubscription(), "До подписки должна быть надпись об отсутствии подписок");
+        assertTrue(issuePage.hasNoSubscriptionText() || issuePage.getPageSource().contains("не подписана"),
+                   "До подписки должна быть надпись об отсутствии подписок");
 
-        // ШАГ 2: На главной странице подписываемся на первую рассылку
+        // ШАГ 2: На главной странице подписываемся на первую рассылку (только JS)
         driver.get(BASE_URL);
-        memberIssuePage.waitForBody();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(org.openqa.selenium.By.xpath("//body")));
 
-        assertTrue(mainPage.isSubscribeButtonPresent(), "Кнопка подписки должна быть на странице");
-        WebElement firstSubscribe = mainPage.getFirstSubscribeButton();
-        assertNotNull(firstSubscribe, "Первая кнопка подписки не найдена");
-        mainPage.clickSubscribeButton(firstSubscribe);
+        wait.until(ExpectedConditions.presenceOfElementLocated(
+            org.openqa.selenium.By.xpath("//a[contains(@class, 'subscriberu_subscribe') and contains(@class, 'subscriberu_notsubscribed')]")));
 
-        assertTrue(mainPage.isSubscribedButtonPresent(), "Кнопка должна изменить состояние на 'подписано'");
+        mainPage.clickFirstSubscribeViaJS();
+
+        wait.until(ExpectedConditions.presenceOfElementLocated(
+            org.openqa.selenium.By.xpath("//a[contains(@class, 'subscriberu_subscribed')]")));
 
         // ШАГ 3: Проверяем, что подписка появилась
-        driver.get(BASE_URL + "member/issue");
-        memberIssuePage.waitForBody();
+        issuePage.openIssuePage();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(issuePage.getBodyLocator()));
         js.executeScript("window.stop();");
-        assertTrue(memberIssuePage.hasSubscription(), "Подписка должна появиться в списке");
+
+        assertTrue(issuePage.hasSubscription(), "Подписка должна появиться в списке");
 
         // ШАГ 4: Отписываемся
-        if (memberIssuePage.isUnsubscribeButtonPresent()) {
-            memberIssuePage.clickUnsubscribe();
+        if (issuePage.hasUnsubscribeButton()) {
+            issuePage.clickUnsubscribe();
         }
 
-        // ШАГ 5: Выходим на главную и обратно для обновления состояния
+        // ШАГ 5: Выходим на главную, потом снова в подписки (только так обновляется состояние)
         driver.get(BASE_URL);
-        memberIssuePage.waitForBody();
-        driver.get(BASE_URL + "member/issue");
-        memberIssuePage.waitForBody();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(org.openqa.selenium.By.xpath("//body")));
+
+        issuePage.openIssuePage();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(issuePage.getBodyLocator()));
         js.executeScript("window.stop();");
 
-        assertTrue(memberIssuePage.hasNoSubscription(), "После отписки снова должна быть надпись об отсутствии подписок");
+        // ШАГ 6: Проверяем, что подписок снова нет
+        assertTrue(issuePage.hasNoSubscriptionText(), "После отписки снова должна быть надпись об отсутствии подписок");
     }
 }

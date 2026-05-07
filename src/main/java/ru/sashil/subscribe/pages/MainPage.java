@@ -1,6 +1,7 @@
 package ru.sashil.subscribe.pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -35,7 +36,17 @@ public class MainPage extends BasePage {
         return driver.findElements(subscribedButton).size() > 0;
     }
 
-    public void clickSubscribeButton(WebElement button) {
-        button.click();
+    public void clickSubscribeByIndex(int index) {
+        List<WebElement> buttons = getSubscribeButtons();
+        if (buttons.size() > index) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttons.get(index));
+        }
+    }
+
+    public void clickFirstSubscribeViaJS() {
+        List<WebElement> buttons = getSubscribeButtons();
+        if (buttons.size() > 0) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttons.get(0));
+        }
     }
 }
