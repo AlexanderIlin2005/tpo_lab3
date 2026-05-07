@@ -20,15 +20,12 @@ public class MainPageSubscribeTest extends BaseTest {
 
         // ШАГ 2: На главной странице подписываемся на первую рассылку (только JS)
         driver.get(BASE_URL);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(org.openqa.selenium.By.xpath("//body")));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(issuePage.getBodyLocator()));
 
-        wait.until(ExpectedConditions.presenceOfElementLocated(
-            org.openqa.selenium.By.xpath("//a[contains(@class, 'subscriberu_subscribe') and contains(@class, 'subscriberu_notsubscribed')]")));
-
+        wait.until(ExpectedConditions.presenceOfElementLocated(mainPage.getSubscribeButtonLocator()));
         mainPage.clickFirstSubscribeViaJS();
 
-        wait.until(ExpectedConditions.presenceOfElementLocated(
-            org.openqa.selenium.By.xpath("//a[contains(@class, 'subscriberu_subscribed')]")));
+        wait.until(ExpectedConditions.presenceOfElementLocated(mainPage.getSubscribedButtonLocator()));
 
         // ШАГ 3: Проверяем, что подписка появилась
         issuePage.openIssuePage();
@@ -44,7 +41,7 @@ public class MainPageSubscribeTest extends BaseTest {
 
         // ШАГ 5: Выходим на главную, потом снова в подписки (только так обновляется состояние)
         driver.get(BASE_URL);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(org.openqa.selenium.By.xpath("//body")));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(issuePage.getBodyLocator()));
 
         issuePage.openIssuePage();
         wait.until(ExpectedConditions.visibilityOfElementLocated(issuePage.getBodyLocator()));

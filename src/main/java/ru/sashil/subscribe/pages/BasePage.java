@@ -1,5 +1,6 @@
 package ru.sashil.subscribe.pages;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import ru.sashil.subscribe.utils.WaitHelper;
 
@@ -14,5 +15,9 @@ public abstract class BasePage {
 
     public void open(String url) {
         driver.get(url);
+    }
+
+    public By getBodyLocator() {
+        return org.openqa.selenium.By.xpath("//body");
     }
 }

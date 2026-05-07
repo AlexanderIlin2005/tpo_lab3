@@ -49,4 +49,12 @@ public class MainPage extends BasePage {
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttons.get(0));
         }
     }
+
+    public By getSubscribeButtonLocator() {
+        return subscribeButton;
+    }
+
+    public By getSubscribedButtonLocator() {
+        return subscribedButton;
+    }
 }
